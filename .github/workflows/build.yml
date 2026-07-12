@@ -1,7 +1,6 @@
 name: CI/CD Build
 
 on:
-  pull_request:
   workflow_dispatch:
 
 concurrency:
