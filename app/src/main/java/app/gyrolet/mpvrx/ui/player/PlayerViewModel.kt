@@ -2783,7 +2783,6 @@ class PlayerViewModel(
     }
     _controlsShown.value = true
     controlsVisibleForPolling = true
-    collapseFrameNavigation()
   }
 
   fun hideControls() {
@@ -2797,7 +2796,6 @@ class PlayerViewModel(
     _seekBarShown.value = false
     controlsVisibleForPolling = false
     seekBarVisibleForPolling = false
-    collapseFrameNavigation()
   }
 
   fun autoHideControls() {
@@ -2811,7 +2809,6 @@ class PlayerViewModel(
     _seekBarShown.value = true
     controlsVisibleForPolling = false
     seekBarVisibleForPolling = true
-    collapseFrameNavigation()
   }
 
   fun showSeekBar() {
@@ -3622,14 +3619,6 @@ class PlayerViewModel(
   }
 
   private var frameNavigationCollapseJob: Job? = null
-
-  /** Immediately collapse the frame navigation back to its single-button state. */
-  fun collapseFrameNavigation() {
-    frameNavigationCollapseJob?.cancel()
-    if (_isFrameNavigationExpanded.value) {
-      _isFrameNavigationExpanded.value = false
-    }
-  }
 
   fun resetFrameNavigationTimer() {
     frameNavigationCollapseJob?.cancel()
