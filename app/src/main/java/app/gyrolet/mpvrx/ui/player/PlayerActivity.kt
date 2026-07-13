@@ -2867,6 +2867,9 @@ class PlayerActivity :
       }
     }
 
+    // Reset any manual rotation override from the previous video
+    viewModel.resetRotationOverride()
+
     // Only set orientation immediately if NOT in Video mode
     // For Video mode, wait for video-params/aspect to become available
     if (playerPreferences.orientation.get() != PlayerOrientation.Video) {
@@ -3727,6 +3730,12 @@ class PlayerActivity :
    * to the correct orientation, starting with landscape as fallback.
    */
   private fun setOrientation() {
+    // If the user manually pressed the rotation button, don't override their choice
+    if (viewModel.isRotationOverrideActive) {
+      Log.d(TAG, "setOrientation - Skipped: user rotation override is active")
+      return
+    }
+
     val orientationPref = playerPreferences.orientation.get()
 
     requestedOrientation =

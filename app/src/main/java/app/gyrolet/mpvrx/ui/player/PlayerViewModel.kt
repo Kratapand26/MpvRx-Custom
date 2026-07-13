@@ -3351,7 +3351,14 @@ class PlayerViewModel(
     changeVideoAspect(playerPreferences.lastVideoAspect.get(), showUpdate)
   }
 
-  // ==================== Screen Rotation ====================
+  /** When true, the user has manually pressed the rotation button — skip automatic setOrientation(). */
+  var isRotationOverrideActive = false
+    private set
+
+  /** Called when a new video loads to allow automatic orientation to work again. */
+  fun resetRotationOverride() {
+    isRotationOverrideActive = false
+  }
 
   fun cycleScreenRotations() {
     // Temporarily force-lock orientation WITHOUT modifying preferences
@@ -3366,6 +3373,9 @@ class PlayerViewModel(
     } else {
       ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     }
+
+    // Mark override active so automatic orientation changes are blocked
+    isRotationOverrideActive = true
   }
 
   // ==================== Lua Invocation Handling ====================
