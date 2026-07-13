@@ -3372,6 +3372,9 @@ class PlayerViewModel(
   }
 
   fun cycleScreenRotations() {
+    val initialReq = host.hostRequestedOrientation
+    Log.d("MpvRxRotation", "cycleScreenRotations - START. initialReq=$initialReq, overrideActive=$isRotationOverrideActive, forcedLandscapeInit=$isForcedLandscapeInitialized, forcedLandscape=$forcedLandscape")
+
     // Mark override active so automatic orientation changes from video params are blocked
     isRotationOverrideActive = true
 
@@ -3381,17 +3384,23 @@ class PlayerViewModel(
       val isLandscape = metrics.widthPixels > metrics.heightPixels
       forcedLandscape = isLandscape
       isForcedLandscapeInitialized = true
+      Log.d("MpvRxRotation", "cycleScreenRotations - First time init. Screen metrics: ${metrics.widthPixels}x${metrics.heightPixels}, determined isLandscape=$isLandscape")
     }
 
     // Toggle the state
     forcedLandscape = !forcedLandscape
 
-    // Apply the forced state
-    host.hostRequestedOrientation = if (forcedLandscape) {
+    val targetOrientation = if (forcedLandscape) {
       ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     } else {
       ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
+
+    Log.d("MpvRxRotation", "cycleScreenRotations - Applying target. forcedLandscape=$forcedLandscape, targetOrientation=$targetOrientation")
+    showToast("Requested: " + (if (forcedLandscape) "Landscape" else "Portrait"))
+
+    // Apply the forced state
+    host.hostRequestedOrientation = targetOrientation
   }
 
   // ==================== Lua Invocation Handling ====================
