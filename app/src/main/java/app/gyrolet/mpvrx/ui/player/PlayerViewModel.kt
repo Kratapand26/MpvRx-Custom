@@ -3387,9 +3387,9 @@ class PlayerViewModel(
 
     // Apply the forced state
     host.hostRequestedOrientation = if (forcedLandscape) {
-      ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+      ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
     } else {
-      ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+      ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
     }
   }
 
