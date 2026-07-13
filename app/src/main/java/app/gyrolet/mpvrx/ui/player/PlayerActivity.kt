@@ -2891,9 +2891,6 @@ class PlayerActivity :
       }
     }
 
-    // Reset any manual rotation override from the previous video
-    viewModel.resetRotationOverride()
-
     // Only set orientation immediately if NOT in Video mode
     // For Video mode, wait for video-params/aspect to become available
     if (playerPreferences.orientation.get() != PlayerOrientation.Video) {
