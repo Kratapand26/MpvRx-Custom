@@ -3361,21 +3361,34 @@ class PlayerViewModel(
   }
 
   fun cycleScreenRotations() {
-    // Temporarily force-lock orientation WITHOUT modifying preferences
-    // Preferences remain the single source of truth and will be reapplied on next video
-    // Uses fixed (non-sensor) orientations so the screen stays locked until next video
-    
-    // Check actual physical orientation to decide which way to toggle
-    val isLandscape = host.context.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
-    
-    host.hostRequestedOrientation = if (isLandscape) {
-      ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-    } else {
-      ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-    }
-
-    // Mark override active so automatic orientation changes are blocked
+    // Mark override active so automatic orientation changes from video params are blocked
     isRotationOverrideActive = true
+
+    val currentReq = host.hostRequestedOrientation
+    
+    // Check if we are currently in some portrait mode
+    val isCurrentlyPortrait = currentReq == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT ||
+                              currentReq == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT ||
+                              currentReq == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+
+    // Check if we are currently in some landscape mode
+    val isCurrentlyLandscape = currentReq == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ||
+                               currentReq == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE ||
+                               currentReq == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+
+    if (isCurrentlyPortrait) {
+      host.hostRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    } else if (isCurrentlyLandscape) {
+      host.hostRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    } else {
+      // Fallback if unspecified
+      val isLandscape = host.context.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+      host.hostRequestedOrientation = if (isLandscape) {
+        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+      } else {
+        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+      }
+    }
   }
 
   // ==================== Lua Invocation Handling ====================
