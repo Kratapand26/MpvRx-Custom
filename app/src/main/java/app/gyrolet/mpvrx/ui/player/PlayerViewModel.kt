@@ -3361,42 +3361,35 @@ class PlayerViewModel(
   var isRotationOverrideActive = false
     private set
 
+  private var isForcedLandscapeInitialized = false
+  private var forcedLandscape: Boolean = true
+
   /** Called when a new video loads to allow automatic orientation to work again. */
   fun resetRotationOverride() {
     isRotationOverrideActive = false
+    isForcedLandscapeInitialized = false
   }
 
   fun cycleScreenRotations() {
     // Mark override active so automatic orientation changes from video params are blocked
     isRotationOverrideActive = true
 
-    val currentReq = host.hostRequestedOrientation
-    
-    // Check if we are currently in some portrait mode
-    val isCurrentlyPortrait = currentReq == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT ||
-                              currentReq == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT ||
-                              currentReq == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT ||
-                              currentReq == ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT
-
-    // Check if we are currently in some landscape mode
-    val isCurrentlyLandscape = currentReq == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ||
-                               currentReq == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE ||
-                               currentReq == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE ||
-                               currentReq == ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
-
-    if (isCurrentlyPortrait) {
-      host.hostRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-    } else if (isCurrentlyLandscape) {
-      host.hostRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-    } else {
-      // Fallback if unspecified. Use physical screen dimensions to be 100% accurate on tablets.
+    // Initialize based on current physical orientation if it's the first time
+    if (!isForcedLandscapeInitialized) {
       val metrics = host.context.resources.displayMetrics
-      val isVisiblyLandscape = metrics.widthPixels > metrics.heightPixels
-      host.hostRequestedOrientation = if (isVisiblyLandscape) {
-        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-      } else {
-        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-      }
+      val isLandscape = metrics.widthPixels > metrics.heightPixels
+      forcedLandscape = isLandscape
+      isForcedLandscapeInitialized = true
+    }
+
+    // Toggle the state
+    forcedLandscape = !forcedLandscape
+
+    // Apply the forced state
+    host.hostRequestedOrientation = if (forcedLandscape) {
+      ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    } else {
+      ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
   }
 
