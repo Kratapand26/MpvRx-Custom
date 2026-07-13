@@ -3385,17 +3385,17 @@ class PlayerViewModel(
                                currentReq == ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
 
     if (isCurrentlyPortrait) {
-      host.hostRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+      host.hostRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     } else if (isCurrentlyLandscape) {
-      host.hostRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+      host.hostRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     } else {
       // Fallback if unspecified. Use physical screen dimensions to be 100% accurate on tablets.
       val metrics = host.context.resources.displayMetrics
       val isVisiblyLandscape = metrics.widthPixels > metrics.heightPixels
       host.hostRequestedOrientation = if (isVisiblyLandscape) {
-        ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
       } else {
-        ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
       }
     }
   }

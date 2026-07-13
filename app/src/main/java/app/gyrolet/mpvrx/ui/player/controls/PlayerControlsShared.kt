@@ -316,6 +316,7 @@ fun RenderPlayerButton(
       ControlsButton(
         icon = Icons.Default.ScreenRotation,
         onClick = viewModel::cycleScreenRotations,
+        onLongClick = { onOpenSheet(Sheets.VideoOrientation) },
         color = if (hideBackground) controlColor else MaterialTheme.colorScheme.onSurface,
         modifier = Modifier.size(buttonSize),
       )

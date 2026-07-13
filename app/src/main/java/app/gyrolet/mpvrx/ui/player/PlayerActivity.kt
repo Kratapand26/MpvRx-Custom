@@ -601,6 +601,13 @@ class PlayerActivity :
     if (playerPreferences.orientation.get() != PlayerOrientation.Video) {
       setOrientation()
     }
+    
+    // Ensure orientation changes from the bottom sheet immediately apply to the Activity
+    lifecycleScope.launch {
+      playerPreferences.orientation.changes().collect {
+        setOrientation()
+      }
+    }
 
     // Apply persisted shuffle state after playlist is loaded
     viewModel.applyPersistedShuffleState()
