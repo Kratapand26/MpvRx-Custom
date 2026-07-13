@@ -2489,6 +2489,23 @@ class PlayerActivity :
     super.onConfigurationChanged(newConfig)
     val isPortrait = newConfig.orientation == Configuration.ORIENTATION_PORTRAIT
     viewModel.onOrientationChanged(isPortrait)
+
+    // Active orientation enforcement: if the manual override is active, check if the
+    // physical layout matches our target orientation. If there is a mismatch (e.g.
+    // caused by a third-party app or system macro forcing it back), re-enforce the value.
+    if (viewModel.isRotationOverrideActive) {
+      val desiredLandscape = viewModel.forcedLandscape
+      val actualLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE
+      if (desiredLandscape != actualLandscape) {
+        Log.w(TAG, "onConfigurationChanged - Orientation mismatch! Expected landscape=$desiredLandscape. Re-enforcing.")
+        requestedOrientation = if (desiredLandscape) {
+          ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        } else {
+          ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+      }
+    }
+
     if (isReady) {
       handleConfigurationChange()
     }

@@ -3362,7 +3362,8 @@ class PlayerViewModel(
     private set
 
   private var isForcedLandscapeInitialized = false
-  private var forcedLandscape: Boolean = true
+  var forcedLandscape: Boolean = true
+    private set
 
   /** Called when a new video loads to allow automatic orientation to work again. */
   fun resetRotationOverride() {
@@ -3387,9 +3388,9 @@ class PlayerViewModel(
 
     // Apply the forced state
     host.hostRequestedOrientation = if (forcedLandscape) {
-      ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+      ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     } else {
-      ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+      ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
   }
 
