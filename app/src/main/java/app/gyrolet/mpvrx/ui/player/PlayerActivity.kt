@@ -2490,17 +2490,14 @@ class PlayerActivity :
     val isPortrait = newConfig.orientation == Configuration.ORIENTATION_PORTRAIT
     viewModel.onOrientationChanged(isPortrait)
 
-    Log.d("MpvRxRotation", "onConfigurationChanged - Triggered. newConfig.orientation=${newConfig.orientation} (isPortrait=$isPortrait), isRotationOverrideActive=${viewModel.isRotationOverrideActive}, requestedOrientation=$requestedOrientation")
-
     // Active orientation enforcement: if the manual override is active, check if the
     // physical layout matches our target orientation. If there is a mismatch (e.g.
     // caused by a third-party app or system macro forcing it back), re-enforce the value.
     if (viewModel.isRotationOverrideActive) {
       val desiredLandscape = viewModel.forcedLandscape
       val actualLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE
-      Log.d("MpvRxRotation", "onConfigurationChanged - Override active. desiredLandscape=$desiredLandscape, actualLandscape=$actualLandscape")
       if (desiredLandscape != actualLandscape) {
-        Log.w("MpvRxRotation", "onConfigurationChanged - Orientation mismatch! Expected landscape=$desiredLandscape. RE-ENFORCING TARGET!")
+        Log.w(TAG, "onConfigurationChanged - Orientation mismatch! Expected landscape=$desiredLandscape. Re-enforcing.")
         requestedOrientation = if (desiredLandscape) {
           ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         } else {
@@ -3759,12 +3756,11 @@ class PlayerActivity :
   private fun setOrientation() {
     // If the user manually pressed the rotation button, don't override their choice
     if (viewModel.isRotationOverrideActive) {
-      Log.d("MpvRxRotation", "setOrientation - SKIPPED. User manual rotation override is currently active.")
+      Log.d(TAG, "setOrientation - Skipped: user rotation override is active")
       return
     }
 
     val orientationPref = playerPreferences.orientation.get()
-    Log.d("MpvRxRotation", "setOrientation - Applying preference: $orientationPref")
 
     requestedOrientation =
       when (orientationPref) {
