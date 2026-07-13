@@ -831,6 +831,12 @@ class PlayerViewModel(
     _repeatMode.value = playerPreferences.repeatMode.get()
     _shuffleEnabled.value = playerPreferences.shuffleEnabled.get()
 
+    viewModelScope.launch {
+      playerPreferences.orientation.changes().collect {
+        isRotationOverrideActive = false
+      }
+    }
+
     // Observe volume boost cap changes to enforce limits dynamically (in PiP)
     viewModelScope.launch(playbackStateDispatcher) {
       audioPreferences.volumeBoostCap.changes().collect { cap ->
@@ -3369,24 +3375,27 @@ class PlayerViewModel(
     // Check if we are currently in some portrait mode
     val isCurrentlyPortrait = currentReq == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT ||
                               currentReq == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT ||
-                              currentReq == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                              currentReq == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT ||
+                              currentReq == ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT
 
     // Check if we are currently in some landscape mode
     val isCurrentlyLandscape = currentReq == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ||
                                currentReq == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE ||
-                               currentReq == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                               currentReq == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE ||
+                               currentReq == ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
 
     if (isCurrentlyPortrait) {
-      host.hostRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+      host.hostRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
     } else if (isCurrentlyLandscape) {
-      host.hostRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+      host.hostRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
     } else {
-      // Fallback if unspecified
-      val isLandscape = host.context.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
-      host.hostRequestedOrientation = if (isLandscape) {
-        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+      // Fallback if unspecified. Use physical screen dimensions to be 100% accurate on tablets.
+      val metrics = host.context.resources.displayMetrics
+      val isVisiblyLandscape = metrics.widthPixels > metrics.heightPixels
+      host.hostRequestedOrientation = if (isVisiblyLandscape) {
+        ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
       } else {
-        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
       }
     }
   }
