@@ -4764,25 +4764,41 @@ class PlayerViewModel : ViewModel(),
 
   // ==================== Screen Rotation ====================
 
+  /** When true, the user has manually pressed the rotation button — skip automatic setOrientation(). */
+  var isRotationOverrideActive = false
+    private set
+
+  private var isForcedLandscapeInitialized = false
+  var forcedLandscape: Boolean = true
+    private set
+
+  /** Called when a new video loads to allow automatic orientation to work again. */
+  fun resetRotationOverride() {
+    isRotationOverrideActive = false
+    isForcedLandscapeInitialized = false
+  }
+
   fun cycleScreenRotations() {
-    if (isAudioOnly.value) {
-      host.hostRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-      return
+    // Mark override active so automatic orientation changes from video params are blocked
+    isRotationOverrideActive = true
+
+    // Initialize based on current physical orientation if it's the first time
+    if (!isForcedLandscapeInitialized) {
+      val metrics = host.context.resources.displayMetrics
+      val isLandscape = metrics.widthPixels > metrics.heightPixels
+      forcedLandscape = isLandscape
+      isForcedLandscapeInitialized = true
     }
-    // Temporarily cycle orientation WITHOUT modifying preferences
-    // Preferences remain the single source of truth and will be reapplied on next video
-    host.hostRequestedOrientation =
-      when (host.hostRequestedOrientation) {
-        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE,
-        ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE,
-        ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE,
-        -> {
-          ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-        }
-        else -> {
-          ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        }
-      }
+
+    // Toggle the state
+    forcedLandscape = !forcedLandscape
+
+    // Apply the forced state
+    host.hostRequestedOrientation = if (forcedLandscape) {
+      ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    } else {
+      ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
   }
 
   // ==================== Lua Invocation Handling ====================

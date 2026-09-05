@@ -1,0 +1,6 @@
+## 🛡️ General Behavior & Development Principles
+
+- **Take Your Time & Be Careful**: Always approach tasks methodically. Do not rush to conclusions or make blind guesses. Write code and troubleshoot like a senior developer—thoroughly verify the root cause, validate assumptions before making changes, and prioritize clean, robust solutions.
+- **No Blind Replacements**: Never perform blind global string replacements across project files or build scripts, as this frequently corrupts structural syntax, style declarations, or exact enumerations.
+- **Direct File Edits Only (No Helper Scripts)**: Never use external or scratch scripts (e.g., Python, PowerShell, or Bash scripts) to write, edit, or patch source files. Always create and edit code files directly using native file editing tools.
+- **Upstream Synchronization**: When synchronizing, porting, or copying code from upstream repositories or submodules, always inspect and check out the exact commit hash corresponding to the target version. Never pull blindly from upstream branches.

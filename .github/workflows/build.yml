@@ -1,10 +1,6 @@
 name: CI/CD Build
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
   workflow_dispatch:
     inputs:
       build_flavor:
@@ -190,72 +186,91 @@ jobs:
             fi
           fi
 
+      - name: Rename APKs to MpvRx
+        shell: bash
+        run: |
+          set -euo pipefail
+          find app/build/outputs/apk -type f -name 'app-*.apk' | while read -r file; do
+            dir=$(dirname "$file")
+            base=$(basename "$file")
+            new_base=$(echo "$base" | sed 's/^app-/MpvRx-/')
+            echo "Renaming $base -> $new_base"
+            mv "$file" "$dir/$new_base"
+          done
+
       - name: Upload arm64-v8a APK
         if: ${{ env.SELECTED_FLAVOR == 'all' || env.SELECTED_FLAVOR == 'dual' || env.SELECTED_FLAVOR == 'standard' }}
         uses: actions/upload-artifact@v7
         with:
-          name: app-standard-arm64-v8a-release-${{ env.SHORT_SHA }}
-          path: app/build/outputs/apk/standard/release/app-standard-arm64-v8a-release*.apk
+          name: MpvRx-standard-arm64-v8a-release-${{ env.SHORT_SHA }}
+          path: app/build/outputs/apk/standard/release/MpvRx-standard-arm64-v8a-release*.apk
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+          archive: false
 
       - name: Upload armeabi-v7a APK
         if: ${{ env.SELECTED_FLAVOR == 'all' || env.SELECTED_FLAVOR == 'dual' || env.SELECTED_FLAVOR == 'standard' }}
         uses: actions/upload-artifact@v7
         with:
-          name: app-standard-armeabi-v7a-release-${{ env.SHORT_SHA }}
-          path: app/build/outputs/apk/standard/release/app-standard-armeabi-v7a-release*.apk
+          name: MpvRx-standard-armeabi-v7a-release-${{ env.SHORT_SHA }}
+          path: app/build/outputs/apk/standard/release/MpvRx-standard-armeabi-v7a-release*.apk
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+          archive: false
 
       - name: Upload universal APK
         if: ${{ env.SELECTED_FLAVOR == 'all' || env.SELECTED_FLAVOR == 'dual' || env.SELECTED_FLAVOR == 'standard' }}
         uses: actions/upload-artifact@v7
         with:
-          name: app-standard-universal-release-${{ env.SHORT_SHA }}
-          path: app/build/outputs/apk/standard/release/app-standard-universal-release*.apk
+          name: MpvRx-standard-universal-release-${{ env.SHORT_SHA }}
+          path: app/build/outputs/apk/standard/release/MpvRx-standard-universal-release*.apk
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+          archive: false
 
       - name: Upload x86 APK
         if: ${{ env.SELECTED_FLAVOR == 'all' || env.SELECTED_FLAVOR == 'dual' || env.SELECTED_FLAVOR == 'standard' }}
         uses: actions/upload-artifact@v7
         with:
-          name: app-standard-x86-release-${{ env.SHORT_SHA }}
-          path: app/build/outputs/apk/standard/release/app-standard-x86-release*.apk
+          name: MpvRx-standard-x86-release-${{ env.SHORT_SHA }}
+          path: app/build/outputs/apk/standard/release/MpvRx-standard-x86-release*.apk
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+          archive: false
 
       - name: Upload x86_64 APK
         if: ${{ env.SELECTED_FLAVOR == 'all' || env.SELECTED_FLAVOR == 'dual' || env.SELECTED_FLAVOR == 'standard' }}
         uses: actions/upload-artifact@v7
         with:
-          name: app-standard-x86_64-release-${{ env.SHORT_SHA }}
-          path: app/build/outputs/apk/standard/release/app-standard-x86_64-release*.apk
+          name: MpvRx-standard-x86_64-release-${{ env.SHORT_SHA }}
+          path: app/build/outputs/apk/standard/release/MpvRx-standard-x86_64-release*.apk
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+          archive: false
 
       - name: Upload Fongmi universal APK
         if: ${{ env.SELECTED_FLAVOR == 'all' || env.SELECTED_FLAVOR == 'dual' || env.SELECTED_FLAVOR == 'fongmi' }}
         uses: actions/upload-artifact@v7
         with:
-          name: app-fongmi-release-${{ env.SHORT_SHA }}
-          path: app/build/outputs/apk/fongmi/release/app-fongmi-universal-release*.apk
+          name: MpvRx-fongmi-release-${{ env.SHORT_SHA }}
+          path: app/build/outputs/apk/fongmi/release/MpvRx-fongmi-universal-release*.apk
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+          archive: false
 
       - name: Upload non-Vulkan universal APK
         if: ${{ env.SELECTED_FLAVOR == 'all' || env.SELECTED_FLAVOR == 'no_vulkan' }}
         uses: actions/upload-artifact@v7
         with:
-          name: app-no-vulkan-release-${{ env.SHORT_SHA }}
-          path: app/build/outputs/apk/noVulkan/release/app-noVulkan-universal-release*.apk
+          name: MpvRx-no-vulkan-release-${{ env.SHORT_SHA }}
+          path: app/build/outputs/apk/noVulkan/release/MpvRx-noVulkan-universal-release*.apk
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+          archive: false
