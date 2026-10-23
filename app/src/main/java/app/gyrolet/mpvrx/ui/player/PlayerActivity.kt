@@ -4420,6 +4420,23 @@ class PlayerActivity :
     super.onConfigurationChanged(newConfig)
     viewModel.onOrientationChanged()
     binding.root.post(::updateVideoAmbientPlayerBounds)
+
+    // Active orientation enforcement: if the manual override is active, check if the
+    // physical layout matches our target orientation. If there is a mismatch (e.g.
+    // caused by a third-party app or system macro forcing it back), re-enforce the value.
+    if (viewModel.isRotationOverrideActive) {
+      val desiredLandscape = viewModel.forcedLandscape
+      val actualLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE
+      if (desiredLandscape != actualLandscape) {
+        Log.w(TAG, "onConfigurationChanged - Orientation mismatch! Expected landscape=$desiredLandscape. Re-enforcing.")
+        requestedOrientation = if (desiredLandscape) {
+          ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        } else {
+          ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+      }
+    }
+
     if (isReady) {
       handleConfigurationChange()
     }
@@ -6691,6 +6708,12 @@ private suspend fun restorePlaybackPosition(state: PlaybackStateEntity?, loadGen
    * read it here instead.
    */
   private fun setOrientation(sourceAspect: Double? = null) {
+    // If the user manually pressed the rotation button, don't override their choice
+    if (viewModel.isRotationOverrideActive) {
+      Log.d(TAG, "setOrientation - Skipped: user rotation override is active")
+      return
+    }
+
     if (isTelevision) {
       requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
       return

@@ -42,7 +42,7 @@
 
     <application
         android:name=".App"
-        android:appCategory="video"
+        android:appCategory="game"
         android:banner="@drawable/tv_banner_solid_purple"
         android:enableOnBackInvokedCallback="false"
         android:icon="@mipmap/ic_launcher_solid_purple"
